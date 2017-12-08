@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+	<head>
+		<title>WebGL</title>
+		<script src="jquery-3.1.1.js"></script>
+		<script src="engine/deploy/path.js"></script>
+		<script src="engine/deploy/include.js"></script>
+		<script defer>
+		function Preload()
+		{
+			include('./engine/core.js');
+			include('./launch-test/testentity.js');
+			include('./launch-test/cameraentity.js');
+		}
+
+		function OnLoad()
+		{
+			Preload();
+			var core = new Core();
+			Core.prototype.BeginPlay = function()
+			{
+				this.Resource.LoadModel("ModelStalin", "./res/stalin.obj");
+				this.Resource.LoadTexture("TexStalin", "./res/stalin.png"); //TODO: Fix precache. Sync it.
+
+				this.Resource.LoadModel("ModelUVCube", "./engine/primitives/UVCube.obj");
+				this.Resource.LoadTexture("TexUVCube", "./engine/primitives/UVCube.png");
+
+				var D = this.core.Render.AddDirectionalLight();
+				D.Direction = [0.5, -1.0, 0.0];
+				D.Color = [1.0, 1.0, 1.0];
+				D.Strength = 0.99;
+
+				var stalinmodel = this.Resource.Get("ModelStalin");
+
+				var stalincentre = this.Scene.Spawn(TestEntity, this);
+				stalincentre.Location = [0, 5, 0];
+				stalincentre.Render.Mesh = stalinmodel;
+				stalincentre.Material.Texture = this.Resource.Get("TexStalin");
+				stalincentre.Scale = [0.01, 0.01, 0.01];
+				var rot = quat.create(); quat.setAxisAngle(rot, [0, 1, 0], -45 * Math.PI/180);
+				quat.multiply(stalincentre.Rotation, rot, stalincentre.Rotation);
+
+				var cubemodel = this.Resource.Get("ModelUVCube");
+
+				var cube = this.Scene.Spawn(TestEntity, this);
+				cube.Location = [0, 5, 10];
+				cube.Render.Mesh = cubemodel;
+				cube.Material.Texture = this.Resource.Get("TexUVCube");
+
+				var cam = this.Scene.Spawn(CameraEntity, this);
+				cam.Location = [-7, 5, 0];
+				cam.LastLight.Location = [-4, 5, 0];
+			};
+
+			var ARGS = {
+				canvasid: "glcanvas"
+			};
+			core.Start(ARGS);
+		}
+		</script>
+		<style>
+			* { margin: 0; padding: 0;}
+			body, html { height:100%; }
+			canvas {
+				position:absolute;
+				width:100%;
+				height:100%;
+			}
+		</style>
+	</head>
+	<body onload="OnLoad()">
+		<canvas id="glcanvas">No support for gl canvas. :(</canvas>
+	</body>
+</html>

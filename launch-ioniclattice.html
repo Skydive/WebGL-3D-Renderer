@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+	<head>
+		<title>WebGL</title>
+		<script src="jquery-3.1.1.js"></script>
+		<script sec="engine/deploy/HackTimer.js"></script>
+		<script src="engine/deploy/path.js"></script>
+		<script src="engine/deploy/include.js"></script>
+		<script defer>
+		function Preload()
+		{
+			include('./engine/core.js');
+			include('./ionic-lattice/chargeentity.js');
+			include('./ionic-lattice/cameraentity.js');
+		}
+
+		function OnLoad()
+		{
+			Preload();
+			var core = new Core();
+			Core.prototype.BeginPlay = function()
+			{
+				this.Physics.world.gravity.set(0, 0, 0);
+
+				var D = this.core.Render.AddDirectionalLight();
+				D.Direction = [0.5, -1.0, 0.0];
+				D.Color = [1.0, 1.0, 1.0];
+				D.Strength = 0.99;
+
+				this.Resource.LoadModel("ModelSphere", "./res/Sphere.obj");
+				var SphereModel = this.Resource.Get("ModelSphere");
+				var SphereCharges = [];
+				for(let i = 0; i < 4; i++)
+				{
+					for(let j = 0; j < 4; j++)
+					{
+						for(let k = 0; k < 4; k++)
+						{
+							var SphereCharge = this.Scene.Spawn(ChargeEntity, this);
+							SphereCharge.Location = [5*i, 5+5*j, 5*k];
+							SphereCharge.Render.Mesh = SphereModel;
+							SphereCharge.Charge = 2 * (((i + j + k) % 2 == 0) ? 1 : -1);
+							SphereCharge.StartPhysics();
+							//SphereCharge.Physics.Body.linearDamping = 0.2;
+							SphereCharges.push(SphereCharge);
+						}
+					}
+				}
+
+				var Camera = this.Scene.Spawn(CameraEntity, this);
+				Camera.Location = [-10, 5+1.5*5, 1.5*5];
+
+				getRandomInt = function(min, max) {
+				  min = Math.ceil(min);
+				  max = Math.floor(max);
+				  return Math.floor(Math.random() * (max - min)) + min;
+				}
+
+				Camera.Track = SphereCharges[getRandomInt(0, SphereCharges.length)];
+			};
+
+			var ARGS = {
+				canvasid: "glcanvas"
+			};
+			core.Start(ARGS);
+		}
+		</script>
+		<style>
+			* { margin: 0; padding: 0;}
+			body, html { height:100%; }
+			canvas {
+				position:absolute;
+				width:100%;
+				height:100%;
+			}
+		</style>
+	</head>
+	<body onload="OnLoad()">
+		<canvas id="glcanvas">No support for gl canvas. :(</canvas>
+	</body>
+</html>

@@ -6,5 +6,4 @@ and ionic-lattice demos implement cannon-js as a physics engine.
 A quite poor JavaScript 'hack' was employed, primarily using AJAX, to use seperate JS files with a folder structure.
 This was coded before I knew of the existence of ES6/Babel/Webpack, which my later JS projects are coded in.
 
-Javascript is a terrible language for doing anything other than web development in. Notably due to its failure to
-support operator overloading, making vector/matrix mathematics incredibly complicated to conduct.
+As demonstrated, Javascript is a very challenging language for doing anything other than web development in. Notably due to its failure to support operator overloading, making vector/matrix mathematics incredibly complicated to conduct.
